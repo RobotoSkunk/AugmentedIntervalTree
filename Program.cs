@@ -7,23 +7,12 @@ namespace RobotoSkunk
 	{
 		static readonly float time = 1;
 		static readonly Random random = new();
-		static readonly int total = 100000;
+		static readonly int total = 500000;
 
 		static int needed = 0;
-		static int wrong = 0;
 
-		// static Interval GenerateInterval()
-		// {
-		// 	Interval newInterval = new(GetRandom(0, 50), GetRandom(50, 100));
+		public static int operations = 0;
 
-		// 	// Console.WriteLine($"{newInterval} {(newInterval.HasTime(time) ? "(Has Time)" : "")}");
-
-		// 	if (newInterval.HasTime(time)) {
-		// 		needed++;
-		// 	}
-
-		// 	return newInterval;
-		// }
 
 		static float GetRandom(float min, float max)
 		{
@@ -40,11 +29,12 @@ namespace RobotoSkunk
 
 
 			Interval? root = null;
-			// float maxTime = 100;
 
 			for (int i = 0; i < total; i++) {
-				Interval newInterval = new(GetRandom(0, 50), GetRandom(50, 100));
-				// Interval newInterval = new(i, i + 1);
+				float start = GetRandom(0, 100);
+				float end = start + GetRandom(0, 100 - start);
+
+				Interval newInterval = new(start, end);
 
 				if (newInterval.HasTime(time)) {
 					needed++;
@@ -63,25 +53,20 @@ namespace RobotoSkunk
 			searchIntervalsWatch.Start();
 
 			List<Interval> intervals = new();
-			root?.GetIntersectIntervals(time, intervals);
+			root?.FindIntersectIntervals(time, intervals);
 
 			searchIntervalsWatch.Stop();
 
 
-			// Console.WriteLine($"\nNodes overlaping {time}");
+			Console.WriteLine($"Looking for: {time}\n");
 
-			foreach (Interval interval in intervals) {
-				// Console.WriteLine(interval);
+			Console.WriteLine($"Total nodes: {total}");
+			Console.WriteLine($"Needed: {needed}");
+			Console.WriteLine($"Found: {intervals.Count}");
 
-				if (!interval.HasTime(time)) {
-					wrong++;
-				}
-			}
+			Console.WriteLine($"Executed operations: {operations}");
+			Console.WriteLine($"Operations ratio: {(double)operations / total}\n");
 
-			Console.WriteLine($"Total: {total}");
-			Console.WriteLine($"Needed {needed}");
-			Console.WriteLine($"Found {intervals.Count}");
-			Console.WriteLine($"Wrong {wrong}\n");
 			Console.WriteLine($"Generate tree elapsed time: {generateTreeWatch.ElapsedMilliseconds} ms");
 			Console.WriteLine($"Search intervals elapsed time: {searchIntervalsWatch.ElapsedMilliseconds} ms\n");
 		}

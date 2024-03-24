@@ -65,23 +65,47 @@ namespace RobotoSkunk
 
 		public bool HasTime(float time)
 		{
-			return (Start <= time) && (End >= time);
+			return Start <= time && End >= time;
 		}
 
 
-		public void GetIntersectIntervals(float time, List<Interval> result)
+		public Interval? FindInterval(float time)
 		{
-			if (HasTime(time)) {
-				result ??= new();
+			Program.operations++;
 
+			if (HasTime(time)) {
+				return this;
+			}
+
+			if (Left != null && Left.Max >= time) {
+				Left.FindInterval(time);
+			}
+
+			if (Start <= time) {
+				Right?.FindInterval(time);
+			}
+
+			return null;
+		}
+
+
+		public void FindIntersectIntervals(float time, List<Interval> result)
+		{
+			Program.operations++;
+
+			if (HasTime(time)) {
 				result.Add(this);
 			}
 
 			if (Left != null && Left.Max >= time) {
-				Left.GetIntersectIntervals(time, result);
+				Left.FindIntersectIntervals(time, result);
 			}
 
-			Right?.GetIntersectIntervals(time, result);
+			if (Start > time) {
+				return;
+			}
+
+			Right?.FindIntersectIntervals(time, result);
 		}
 
 
